@@ -18,6 +18,14 @@ int main(void) {
         return 1;
     }
     unw_get_proc_name_by_ip = dlsym(handle_libunwind, "_ULx86_64_get_proc_name_by_ip");
+
+
+    if (unw_get_proc_name_by_ip == NULL) {
+        printf("libunwind too old\n");
+        return 1;
+    }
+
+
     unw_local_addr_space = dlsym(handle_libunwind, "_ULx86_64_local_addr_space");
     unw_local_addr_space = *((void**) unw_local_addr_space); 
 
@@ -27,7 +35,7 @@ int main(void) {
     // This segfaults only when using PyPy's libffi.so that was built on a buildbot
     // Set the path in dlopen to /path/to/your/nightly-pypy/lib/libffi.so.6
     void * handle_libffi = NULL;
-    if ((handle_libffi = dlopen("/path/to/your/nightly-pypy/lib/libffi.so.6", RTLD_NOW)) == NULL) {
+    if ((handle_libffi = dlopen("/path/to/your/nightly-pypy/lib/libffi.so.6", RTLD_NOW)) == NULL) {// this needs to be the libffi.so that ships with a nightly build, ie come from some ancient fedora version
         printf("couldn't open libffi \n");
         return 1;
     }
@@ -35,7 +43,8 @@ int main(void) {
     // prepare a buffer for the function name
     char * buffer = malloc(256 * sizeof(char));
     u_int64_t offset = 0;
-    // function in libffi, not exposed
+
+    // function 'examine_arguments' in libffi, not exposed
     void * func_ptr = (void*) dlsym(handle_libffi, "ffi_prep_cif") + 0x3780;
 
     // libunwind tries to access the gnu hash table of libffi.so,
