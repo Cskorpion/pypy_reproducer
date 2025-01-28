@@ -41,7 +41,7 @@ int main(void) {
     // libunwind tries to access the gnu hash table of libffi.so,
     // but something goes wrong when accessing the gnu hash to find the number of buckets
     // segfault at libunwind/src/elfxx.c:178
-    if (unw_get_proc_name_by_ip(unw_local_addr_space, (u_int64_t) func_ptr, buffer, 128, &offset, NULL) == 0) {
+    if (unw_get_proc_name_by_ip(unw_local_addr_space, (u_int64_t) func_ptr, buffer, 256, &offset, NULL) == 0) {
         printf("found name %s \n", buffer);
     } 
 
